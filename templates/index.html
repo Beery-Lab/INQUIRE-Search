@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+
+<!-- HTML Block following -->
+<html>
+<head>
+<title>Natural Image Retrieval</title>
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+</head>
+<body>
+    <div class="main">
+        <!--  Header when user input is -->
+        <div class="header">
+            <form id="query-form" autocomplete="off">
+                <h3>Use Text to Search in Natural World Images</h3>
+                <p class="subtitle">
+                    Type the concepts you're interested in and find relevant <a href="https://www.inaturalist.org/" target="_blank" style="color: #ffffff">iNaturalist</a> photos. 
+                    <br>
+                    Then, please contribute data by selecting all the images that match your search.
+                </p>
+    
+                <div class="input-container">
+                    <label for="user-input"></label>
+                    <input type="text" id="user-input" placeholder="E.g. [species] involved in [concept]">
+                    <button type="submit" id="search-button" onclick="clickSearch()" disabled title="Type a query"> <i class="fas fa-arrow-right"></i></button>
+                </div>
+                
+    
+            </form>
+            <div id="data-submission">
+                 <!-- Selected Image Counter -->        
+                <div id="selected-count-container">
+                    Selected Images: <span id="selected-count">0</span>
+                </div>
+                <!-- Annotation submission buttons -->        
+                <button type="submit" id="submit-button" onclick="submitSelection(event)" disabled title="Submit selected images">Submit Selection</button>
+                <button type="submit" id="submit-no-relevant" onclick="submitNoRelevant()" disabled title="No relevant images">Nothing Relevant</button>
+            </div>
+            
+    
+        </div>
+        <!-- Somewhere in your HTML -->
+        <!-- <div id="confirmationMessage"></div>
+        <a href="" id="downloadLink" style="display: none;">Download</a> -->
+
+        <div id="confirmationModal"  style="display: none;">
+            <div id="confirmationModal-content">
+                <span id="confirmationModal-close" style="cursor:pointer;">&times;</span>
+                <!-- <span class="close" onclick="closeModal()">&times;</span> -->
+                <p id="confirmationModal-message">Feedback received. Thanks!</p>
+                <a href="" id="downloadLink" style="display: none;">Download your Annotations</a>
+            </div>
+        </div>
+        
+        <!--  Main Image Display Division -->
+        <div class="content">
+            <div id="image-results">
+                    <!-- Images will be displayed here -->        
+            </div>
+
+            <button id="loadMoreImages" onclick="displayImages()" >Show More Images</button>
+            
+            
+            
+            <div id="image-large-container">
+                <!-- Large version of last hovered image will be displayed here --> 
+                <img id="image-large">
+            </div>
+            
+        </div>
+    </div>
+
+
+     <!-- Help button -->  
+    <button id="help-button">?</button>
+    <!-- Help button instructions --> 
+    <div id="help-instructions" class="modal">
+        <div class="modal-content">
+            <span class="close" id="close-button">&times;</span>
+            <h2>Info</h2>
+            <!-- <p>Some information about the app:</p> -->
+            <ul>
+                <li>We are collecting data to help understand what the future of search looks like for wildlife images.</li>
+                <li>The current version does not work well with the Latin species' names.</li>
+                <li>The images are limited to 10,000 iNat species for now, i.e. not all species are present.</li>
+                <li>The text query can only support 256 characters.</li>
+                <!-- Add more instructions as needed -->
+            </ul>
+            
+        </div>
+    </div>
+    <!-- Submit Feedback Button -->
+    <a href="https://forms.gle/RrQnKrzLDvptFW7U6" target="_blank">
+        <button id="feedback-button" title="Lets us know what you think about the app">Submit Feedback</button>
+    </a>
+
+
+    
+
+    <!-- JavaScript Block following -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+
+        // Initialize empty set of selected images
+        const selectedImages = new Set();
+        // image-results section
+        const imageContainer = document.getElementById('image-results');
+        
+        // Selection counting field
+        const selectedCountContainer = document.getElementById('selected-count-container');
+        const selectedCount = document.getElementById('selected-count');
+        
+        // submission buttons
+        const submitButton = document.getElementById('submit-button');
+        const submitNoRelevantButton = document.getElementById('submit-no-relevant');
+
+        
+        // User's query text variable
+        var userQuery = document.getElementById('user-input');
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const helpButton = document.getElementById('help-button');
+            const instructionsModal = document.getElementById('help-instructions');
+            const closeButton = document.getElementById('close-button');
+            const closeConfirmationModal =  document.getElementById('confirmationModal-close');
+
+            // Retrieve Images Button
+            const searchButton = document.getElementById('search-button');
+            // User's search text field
+            const searchInput = document.getElementById('user-input');
+
+            searchInput.addEventListener('input', function () {
+            // Enable the button only if there is at least one character in the search input
+            searchButton.disabled = searchInput.value.length === 0;
+            });
+
+            helpButton.addEventListener('click', function () {
+                instructionsModal.style.display = 'block';
+            });
+
+            closeButton.addEventListener('click', function () {
+                instructionsModal.style.display = 'none';
+            });
+
+            // display "show more images" button only when user scrolls to the bottom of the page
+            document.getElementById('image-results').addEventListener('scroll', function() {
+                const imageResultsDiv = document.getElementById('image-results');
+                // Calculate the distance from the bottom
+                const distanceFromBottom = imageResultsDiv.scrollHeight - imageResultsDiv.clientHeight - imageResultsDiv.scrollTop;
+                // Check if the user has scrolled to the bottom
+                if (distanceFromBottom <= 20) { // 20 is a threshold, adjust as needed
+                    // Show the "Show More Images" button
+                    document.getElementById('loadMoreImages').style.display = 'block';
+
+                      // Show or hide the "Show More Images" button
+                    document.getElementById('loadMoreImages').style.display = currentImageIndex >= imageData.img_ids.length ? 'none' : 'block';
+   
+                }
+                else {
+                    document.getElementById('loadMoreImages').style.display = 'none';
+                }
+            });  
+
+            window.onclick = function(event) {
+            const modal = document.getElementById('confirmationModal');
+            if (event.target === modal) {
+                modal.style.display = 'none';
+
+                // Refresh the page
+                location.reload();
+                
+            }
+
+            // Close button functionality
+            closeConfirmationModal.addEventListener('click', function() {
+                document.getElementById('confirmationModal').style.display = 'none';
+                location.reload();
+            });
+        }
+    });
+    
+        
+        // function to create each image object
+        function createImage(img_id,src,retrieval_score) {
+            const imageDiv = document.createElement('div');
+            imageDiv.className = 'selected-image';
+
+            const image = document.createElement('img');
+            image.src = src;
+            image.alt = 'image missing';
+            image.id = String(img_id);
+            image.retrieval_score = String(retrieval_score);
+            image.width = 500;
+            image.height = 500;
+            
+            // trigger large image display when hovering over image
+            imageDiv.addEventListener("mouseover", function() {
+                document.getElementById("image-large").src = src;
+            });
+            
+            // trigger selection/unselection when clicking image
+            imageDiv.onclick = function () {
+                toggleImage(String(img_id), imageDiv);
+            };
+
+            // add new image to the div
+            imageDiv.appendChild(image);
+            return imageDiv;
+        }
+
+        // function based on interaction with images via selection
+        function toggleImage(ImageId, imageDiv) {
+            if (selectedImages.has(ImageId)) {
+                selectedImages.delete(ImageId);
+                imageDiv.classList.remove('selected'); // Remove the selected class
+            } else {
+                selectedImages.add(ImageId);
+                imageDiv.classList.add('selected'); // Add the selected class
+            }
+            updateSelectedCount();
+            updateSubmitButtonState();
+            
+        }
+        // function to update the submit button state (active/inactive)
+        function updateSubmitButtonState() {
+            submitButton.disabled = selectedImages.size === 0;
+            submitNoRelevantButton.disabled = selectedImages.size > 0;
+        }
+
+
+        // function to update the selected images counter
+        function updateSelectedCount() {
+            selectedCount.textContent = selectedImages.size;
+        }
+        
+        // function that triggers actions on search button's click
+        function clickSearch() {
+             // Get the query text from the input field
+            const queryText = userQuery.value;
+
+            // Store the query text types in a file
+            const dataToStore = {
+                query: queryText,
+            };
+            // Convert the data object to JSON
+            const jsonData = JSON.stringify(dataToStore);
+            
+            // Make an AJAX request to send the JSON data to the server
+            $.post("/submit_data", { data: jsonData }, function(response) {
+            });
+
+
+            // reset the selected images and update the list
+            selectedImages.clear();
+            updateSelectedCount();
+            updateSubmitButtonState();
+
+            // show instructions  
+            selectedCountContainer.classList.remove('hidden');
+            // reveal the submit button
+            // searchButton.classList.add('hidden');
+            submitButton.classList.remove('hidden');
+            submitNoRelevantButton.classList.remove('hidden');
+        }
+        
+        // function that triggers actions when submit button is clicked
+        function submitSelection() {
+            // Get the query text from the input field
+            const queryText = userQuery.value;
+            const retrievedImages = Array.from(imageContainer.querySelectorAll('img')).map(image => ({
+                'id': image.id,
+                'name': image.name,
+                'src': image.src
+            }));
+            const retrievalScores = Array.from(imageContainer.querySelectorAll('img')).map(image => image.retrieval_score);
+            const relevantImages = Array.from(selectedImages)
+            // alert(`Selected Images: ${Array.from(selectedImages).join(', ')}`);
+            // alert(retrievedImages);
+            
+            
+            // You can send the selected image names to the server for further processing here.
+            // Store the query text and selected images list in localStorage
+            const dataToStore = {
+                query: queryText,
+                retrievedImages: retrievedImages,
+                retrievalScores:retrievalScores,
+                relevantImages: relevantImages,
+                
+            };
+            // Convert the data objects to JSON
+            const jsonData = JSON.stringify(dataToStore);
+            // Make an AJAX request to send the JSON data to the server
+            $.post("/submit_data", { data: jsonData }, function(response) {
+                // Show confirmation message
+                document.getElementById('confirmationModal').style.display = 'block';
+
+              // Prepare data for download
+                prepareDownload(dataToStore);
+
+                // Clear the selected images and update the UI
+                selectedImages.clear();
+                updateSelectedCount();
+                updateSubmitButtonState();
+             });            
+
+            }
+
+            
+            function prepareDownload(data) {
+                var subsetData = {
+                query: data.query,
+                relevantImages: data.relevantImages
+                };
+                var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(subsetData));
+                var downloadLink = document.getElementById('downloadLink');
+                downloadLink.setAttribute('href', dataStr);
+                downloadLink.setAttribute('download', 'annotations.json');
+                downloadLink.style.display = 'block'; // Make the link visible
+            
+                // Add a click event listener to the download link to close the modal after download
+                document.getElementById('downloadLink').addEventListener('click', function() {
+                    document.getElementById('confirmationModal').style.display = 'none';
+                    setTimeout(function() {
+                        location.reload(); // Delay the reload to ensure download starts
+                    }, 500); // Adjust the timeout as needed
+                });
+            }
+
+            // function that triggers actions when users click "no relevant images found" button
+            function submitNoRelevant() {
+                // Get the query text from the input field
+                const queryText = userQuery.value;
+                const retrievedImages = Array.from(imageContainer.querySelectorAll('img')).map(image => ({
+                    'id': image.id,
+                    'name': image.name,
+                    'src': image.src
+                }));
+                const retrievalScores = Array.from(imageContainer.querySelectorAll('img')).map(image => image.retrieval_score);
+                
+                
+                // You can send the selected image names to the server for further processing here.
+                // Store the query text and selected images list in localStorage
+                const dataToStore = {
+                    query: queryText,
+                    retrievedImages: retrievedImages,
+                    retrievalScores:retrievalScores,
+                };
+                // Convert the data object to JSON
+                const jsonData = JSON.stringify(dataToStore);
+
+            // Make an AJAX request to send the JSON data to the server
+            $.post("/submit_data", { data: jsonData }, function(response) {
+                // Show confirmation message
+                document.getElementById('confirmationModal').style.display = 'block';
+
+                // Clear the selected images and update the UI
+                selectedImages.clear();
+                updateSelectedCount();
+                updateSubmitButtonState();
+
+             });    
+
+            }
+        
+        // function to display a popup message
+        function showAlert(message,jsonData) {
+            var alertWindow = window.open("", "_blank", "width=300,height=200");
+
+            var subsetData = {
+                query: jsonData.query,
+                relevantImages: fullData.relevantImages
+            };
+            var subsetJsonData = JSON.stringify(subsetData);
+            // Create a pop-up window with the message
+            var alertWindow = window.open("", "_blank", "width=300,height=300");
+
+            // Add the message and the download button to the pop-up window
+            alertWindow.document.write("<p>" + message + "</p>");
+            alertWindow.document.write("<button id='downloadButton'>Download My Annotations</button>");
+
+            // Add event listener for download button in the pop-up
+            alertWindow.document.getElementById('downloadButton').addEventListener('click', function() {
+                downloadAnnotations(subsetJsonData, alertWindow);
+            });
+
+    }
+            
+        
+        // function to close the popup message
+        function closeAlert() {
+            // Close the popup message (not a standard feature, for demonstration only)
+            window.close();
+        }
+
+
+        // function to download annotations - if user wants
+        function downloadAnnotations(data,alertWindow) {
+            var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(data);
+            var downloadAnchorNode = alertWindow.document.createElement('a');
+            downloadAnchorNode.setAttribute("href", dataStr);
+            downloadAnchorNode.setAttribute("download", "annotations.json");
+            document.body.appendChild(downloadAnchorNode); // Required for Firefox
+            downloadAnchorNode.click();
+            downloadAnchorNode.remove();
+            
+        }
+
+
+        // Function to display a batch of images
+        function displayImages() {
+
+             // for (var i = 0; i < data.img_ids.length; i++) {
+            // console.log(endIndex)
+            console.log('cur'+currentImageIndex)
+            console.log('im per page'+imagesPerPage)
+            
+            const endIndex = Math.min(currentImageIndex + imagesPerPage, imageData.img_ids.length);
+            console.log('end'+endIndex)
+            const imageContainer = document.getElementById('image-results');
+            for (let i = currentImageIndex; i < endIndex; i++) {
+                const img = createImage(imageData.img_ids[i], imageData.img_urls[i],imageData.retrieval_scores[i]) // Adjust based on your image data structure
+                imageContainer.appendChild(img)
+            }
+
+            currentImageIndex = endIndex;
+            document.getElementById('loadMoreImages').style.display = 'none';
+                               
+         }
+
+        let imageData = []; // Array to store all image data
+        let currentImageIndex = 0; // Current index in the imageData array
+        const imagesPerPage = 40; // Number of images to display per page
+        var imageCount = 200; // total images to fetch retrievals for
+        // code to call process_query python code with the given input, returning images for display and annotation
+        $(document).ready(function() {
+            $("#query-form").submit(function(e) {
+                e.preventDefault();
+                var userQuery = $("#user-input").val();
+               
+                $.post("/process_query", { user_input: userQuery, image_count: imageCount }, function(data) {
+                    imageData = data  //.img_urls; // Assuming data.img_urls is an array of { img_id, img_url }
+                    currentImageIndex = 0; // Reset the index
+                    $("#image-results").empty();
+                    displayImages(); // Display the first set of images
+                    // for (var i = 0; i < data.img_ids.length; i++) {
+                    //     const img = createImage(data.img_ids[i],data.img_urls[i]) 
+                    
+                    //     imageContainer.appendChild(img)
+                        // $("#image-results").append(img);
+                    // }
+                });
+                
+            });
+        });
+    </script>
+</body>
+</html>

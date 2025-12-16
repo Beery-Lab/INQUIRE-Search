@@ -1,0 +1,30 @@
+{"clip":
+    {"rn50":"RN50",
+    "rn101":"RN101",
+    "rn50x4":"RN50x4",
+    "rn50x16":"RN50x16",
+    "rn50x64":"RN50x64",
+    "vit_b32":"ViT-B/32",
+    "vit_b16":"ViT-B/16",
+    "vit_l14":"ViT-L/14",
+    "vit_l14_336":"ViT-L/14@336px"
+    },
+"align":
+    {"base":"kakaobrain/align-base"
+    },
+"dino_v2":
+    {
+    "vit_s14":"dinov2_vits14",
+    "vit_b14":"dinov2_vitb14",
+    "vit_l14":"dinov2_vitl14",
+    "vit_g14":"dinov2_vitg14"
+    },
+"siglip":
+    {
+        "vit_so400_14_384":"ViT-SO400M-14-SigLIP-384"
+    },
+"siglip_tiny":
+    {
+        "vit_so400_14_384":"ViT-SO400M-14-SigLIP-384"
+    }
+}

@@ -1,0 +1,20 @@
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch>=2.2.0
+torchvision==0.17.0
+timm==0.9.10
+autofaiss
+git+https://github.com/openai/CLIP.git
+open_clip_torch==2.23.0
+ftfy 
+regex 
+tqdm
+Flask
+# mkl
+all-clip
+datasets
+transformers
+psutil
+python-dotenv==1.0.0
+dataset==1.6.2
+waitress>=3.0.0
+

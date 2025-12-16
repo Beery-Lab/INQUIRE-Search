@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Log In</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+</head>
+<body>
+    <h1>Live Device Monitoring</h1>
+    <div>
+        <div id="chart-cpu" style="width:500px; height:400px; display: inline-block;"></div>
+        <div id="chart-mem" style="width:500px; height:400px; display: inline-block;"></div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <script>
+      
+        //let XAXISRANGE = 10;
+        let XAXISRANGE = 100000
+        let startTime = new Date().getTime();
+    
+        //10, 14, 18, 16, 28, 12, 1, 8, 3, 5, 17, 16, 16];
+    
+        var options_cpu = {
+            series: [{
+                data: []
+            }],
+            chart: {
+                id: 'realtime',
+                height: 350,
+                type: 'line',
+                animations: {
+                    enabled: true,
+                    easing: 'linear',
+                    dynamicAnimation: {
+                        speed: 200
+                    }
+                },
+                toolbar: {
+                    show: false
+                },
+                zoom: {
+                    enabled: false
+                }
+            },
+            dataLabels: {
+                enabled: false
+            },
+            stroke: {
+                curve: 'smooth'
+            },
+            title: {
+                text: 'CPU Usage',
+                align: 'left'
+            },
+            markers: {
+                size: 0
+            },
+            xaxis: {
+                type: 'datetime',
+                /*labels: {
+                  show: true,
+                  format: 'ss/dd/MM',
+                },*/
+                labels: {
+                  formatter: function(value, timestamp, opts) {
+                    const options = {
+                      hour12: false
+                      //hour: "2-digit",
+                      //minute: "2-digit"
+                    };
+                    //console.log(date.toLocaleString("de-DE", options));
+                    return new Date(timestamp).toLocaleTimeString("en-us", options)
+                  }
+                },
+                //range: XAXISRANGE,
+              tickPlacement: 'on'
+                //min: startTime
+            },
+            yaxis: {
+                max: 100,
+                min: 0
+            },
+            legend: {
+                show: false
+            },
+        };
+
+        var options_mem = {
+            series: [{
+                data: []
+            }],
+            chart: {
+                id: 'realtime',
+                height: 350,
+                type: 'line',
+                animations: {
+                    enabled: true,
+                    easing: 'linear',
+                    dynamicAnimation: {
+                        speed: 200
+                    }
+                },
+                toolbar: {
+                    show: false
+                },
+                zoom: {
+                    enabled: false
+                }
+            },
+            dataLabels: {
+                enabled: false
+            },
+            stroke: {
+                curve: 'smooth'
+            },
+            title: {
+                text: 'Memory Usage',
+                align: 'left'
+            },
+            markers: {
+                size: 0
+            },
+            xaxis: {
+                type: 'datetime',
+                /*labels: {
+                  show: true,
+                  format: 'ss/dd/MM',
+                },*/
+                labels: {
+                  formatter: function(value, timestamp, opts) {
+                    const options = {
+                      hour12: false
+                      //hour: "2-digit",
+                      //minute: "2-digit"
+                    };
+                    //console.log(date.toLocaleString("de-DE", options));
+                    return new Date(timestamp).toLocaleTimeString("en-us", options)
+                  }
+                },
+                //range: XAXISRANGE,
+              tickPlacement: 'on'
+                //min: startTime
+            },
+            yaxis: {
+                max: 100,
+                min: 0
+            },
+            legend: {
+                show: false
+            },
+        };
+    
+      
+        var cpu_data = [];
+        var mem_data = [];
+      
+        var chart_cpu = new ApexCharts(document.querySelector("#chart-cpu"), options_cpu);
+        var chart_mem = new ApexCharts(document.querySelector("#chart-mem"), options_mem);
+        chart_cpu.render();
+        chart_mem.render();
+    
+        function getRandomInt(max) {
+            return Math.floor(Math.random() * max);
+        }
+    
+        var updateData = function() {
+            $.ajax({
+                url: '/api/device_info',
+                type: "GET",
+                success: function (data) {
+                    var x = new Date().getTime();
+                    cpu_data.push({x, y: data.cpu})
+                    mem_data.push({x, y: data.mem})
+
+                    chart_cpu.updateSeries([{
+                        data: cpu_data
+                    }])
+
+                    chart_mem.updateSeries([{
+                        data: mem_data
+                    }])
+                }
+            });
+
+            cpu_data = cpu_data.slice(cpu_data.length - 60, cpu_data.length);
+            mem_data = mem_data.slice(mem_data.length - 60, mem_data.length);
+        }
+    
+        window.setInterval(function () {
+            updateData();
+        }, 2000)
+        
+    </script>
+</body>
+</html>

@@ -1,0 +1,38 @@
+name: inquire
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.12
+  - pip
+  # Prefer conda for core scientific stack
+  - numpy
+  - pandas
+  - scipy
+  - scikit-learn
+  - geopandas
+  - hatchling
+  # Optional: CUDA runtime from conda if you need it for non-PyTorch CUDA libs
+  # - cudatoolkit=12.1  # uncomment only if you know you need conda’s runtime
+
+  - pip:
+      # - torch==2.8.0+cu129
+      # - torchvision
+      # - torchvision==0.17.0+cu121
+      - timm==0.9.10
+      - autofaiss
+      - git+https://github.com/openai/CLIP.git
+      - open_clip_torch==2.23.0
+      - ftfy
+      - regex
+      - tqdm
+      - Flask
+      - mkl
+      - datasets
+      - transformers
+      - python-dotenv==1.0.0
+      - dataset==1.6.2
+      - waitress>=3.0.0
+
+variables:
+  PIP_EXTRA_INDEX_URL: "https://download.pytorch.org/whl/cu129"

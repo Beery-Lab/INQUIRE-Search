@@ -1,0 +1,415 @@
+/* styles.css */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f5f5f5;
+    margin: 0;
+    padding: 0;
+}
+
+
+/* Update the font-family for the entire page */
+body, select, label, input, button {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 18px;}
+
+.main {
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.content {
+    display: grid;
+    grid-template-columns: 50% 50%;
+    width: 100%;
+    max-width: 1700px;
+    margin: 0 auto;
+    padding: 0px;
+    background-color: #f5f5f5;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: row;
+    overflow: hidden;
+
+}
+
+.header {
+    /* height: 200px; */
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: #333;
+    color: #fff;
+    flex-shrink: 0;
+    text-align: center;
+    display: flex;
+}
+
+.header form {
+    flex-grow: 1;
+    padding: 24px 32px;
+}
+
+.header #data-submission {
+    border-left: 1px solid #fff;
+    width: 260px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.header h3 {
+    font-size: 24px;
+    margin: 0px;
+    font-weight: normal;
+}
+
+#query-form p.subtitle {
+    font-size: 16px;
+    padding: 8px 16px;
+}
+
+.input-container {
+    padding: 0;
+    display: flex;
+    align-items: center;
+    max-width: 800px; /* Adjusted max width */
+    margin: 0 auto; /* Center the container horizontally */
+}
+
+#user-input {
+    flex: 1;
+    margin-right: 5px;
+    width: 60%;
+    height:25px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 18px;    
+   }
+
+#search-button {
+    background-color: #007BFF;
+    width: 50px;
+    height: 50px;
+    padding: 10px;
+    color: #fff;
+    border: none;
+    border-radius: 15px;
+    cursor: pointer;
+    }
+#search-button:hover {
+    background-color: #0056b3;
+    }
+#search-button:disabled {
+    background-color: grey;
+    cursor: not-allowed;
+    }
+    
+/* FontAwesome icon styling */
+i.fas.fa-arrow-right {
+    font-size: 30px;
+}
+
+#submit-button {
+    background-color: #01ba0e;
+    width: 200px;
+    height: 50px;
+    color: #fff;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 16px;
+    margin: 12px
+    }
+#submit-button:hover {
+    background-color: #016908;
+    }
+
+#submit-button:disabled {
+    background-color: grey;
+    cursor: not-allowed;
+    color: #bbb;
+}
+
+
+
+#submit-no-relevant {
+    background-color: #c23232;
+    width: 200px;
+    height: 50px;
+    color: #fff;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 16px;
+    }
+#submit-no-relevant:hover {
+    background-color: #7a2323;
+    }
+#submit-no-relevant:disabled {
+    background-color: grey;
+    color: #bbb;
+    cursor: not-allowed;
+    }
+
+
+#image-results {
+    width: 50%;
+    padding: 20px 10px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    overflow: scroll;
+    gap: 10px;
+}
+
+
+img {
+    width: 260px; /* Make image fill the container */
+    height: 260px; /* Make image fill the container */
+    /* margin: 10px; */
+    /* border: 2px solid #007BFF; */
+    /* border-radius: 5px; */
+    cursor: pointer;
+   
+}
+
+ img:hover {
+    /* border: 2px solid #01690862; */
+    opacity: 0.9;
+    box-sizing: border-box;
+    }
+
+/* Style for unselected image */
+.selected-image {
+    box-sizing: border-box;
+    border: 5px solid  #c232328b; /* Initially set the border to transparent */
+    width: 260px; /* Set a fixed width */
+    height: 260px; /* Set a fixed height */
+    gap: 1px;
+    cursor: pointer;
+    overflow: hidden; /* Ensures that the image doesn't overflow the container */
+}
+
+    /* Style for selected image */
+.selected-image.selected {
+    width: 260px; /* Make image fill the container */
+    height: 260px; /* Make image fill the container */
+    border: 5px solid #01ba0d9c; /* Change the border color for selected images */
+    
+}
+
+/* Style for images inside the container */
+.selected-image img {
+    width: 100%; /* Ensure the image fills the width */
+    height: 100%; /* Ensure the image fills the height */
+    object-fit: cover; /* This will cover the entire area, possibly cropping the image */
+    box-sizing: border-box; 
+}
+    
+#help-button {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    text-align: center;
+    font-size: 30px;
+    cursor: pointer;
+    padding: 5px;
+  }
+
+  .modal {
+    display: none;
+    position: fixed;
+    bottom: 40px;
+    left: 20px;
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 260px;
+  }
+  
+  .modal-content {
+    padding: 20px;
+    font-size: 16px;
+  }
+  
+  .close {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    font-size: 20px;
+    cursor: pointer;
+  }
+
+
+/* styles.css */
+#feedback-button {
+    /* Add your styling here */
+    background-color: #f5f5f5;
+    color: #007bff;
+    border: none;
+    position: fixed;
+    bottom: 25px;
+    right: 25px;
+    cursor: pointer;
+    border-radius: 10px; /* Make the button ellipsoid */
+    font-size: 16px;
+
+    /* Add more styles as needed */
+}
+
+#feedback-button:hover {
+    background-color: #b2cbe7;
+}
+
+#login-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100vh;
+}
+
+#login-container img {
+    border: none;
+    cursor: auto;
+    height: 200px;
+    width: auto;
+}
+
+#login-container img:hover {
+    opacity: 100%;
+}
+
+#login-form h2 {
+    font-weight: normal;
+    /* text-transform: uppercase; */
+}
+
+#login-form {
+    width: 100%;
+    max-width: 500px;
+    /* border: 1px solid #ddd; */
+    /* background-color: white; */
+    padding: 16px 32px;
+    border-radius: 16px;
+    margin-top: 30px;
+    margin-bottom: 200px;
+
+}
+
+#login-input {
+    flex: 1;
+    margin-right: 5px;
+    width: 60%;
+    height:25px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 18px;    
+}
+
+#login-form #search-button i.fas.fa-arrow-right {
+    font-size: 25px;
+}
+
+
+#image-large-container {
+    width: 50%;
+    max-height: 100%;
+    flex-shrink: 0;
+    background-color: #e7e7e7;
+}
+
+#image-large {
+    box-sizing: border-box;
+    height: 100%;
+    width: 100%;
+    object-fit: contain;
+    padding: 20px;
+    border: none;
+    margin: 0;
+}
+
+
+#confirmationModal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgb(0,0,0);
+    background-color: rgba(0,0,0,0.4);
+}
+
+#confirmationModal-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width:30%;
+    height:20%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    padding: 20px;
+    border-radius: 5px; /* Optional for rounded corners */
+    text-align: center; /* Center-align the text */
+}
+#confirmationModal-close {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 1.5em;
+    color: #333;
+    cursor: pointer;
+}
+
+#confirmationModal.close:hover,
+#confirmationModal.close:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+#downloadLink {
+    display: none; /* Initially hidden */
+    margin-top: 10px;
+}
+
+/* styles.css */
+#loadMoreImages {
+    /* Add your styling here */
+    background-color: #f5f5f5;
+    color: #007bff;
+    border: none;
+    position: fixed;
+    width: 50%;
+    left: 0;
+    bottom: 5px;
+    /* left: 25px; */
+    cursor: pointer;
+    border-radius: 5px; /* Make the button ellipsoid */
+    font-size: 16px;
+    display:none;
+}
